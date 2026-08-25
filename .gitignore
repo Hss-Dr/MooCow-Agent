@@ -46,3 +46,6 @@ htmlcov/
 
 # 无代码引用的 tiktoken 缓存词表（运行时按需下载）
 rag-service/app/service/core/9b5ad71b2ce5302211f9c61530b329a4922fc6a4
+
+# 本地 Git 操作手册（不上传）
+GIT_GUIDE.md
