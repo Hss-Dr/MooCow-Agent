@@ -1,0 +1,58 @@
+:root {
+  background-color: #000000;
+  color-scheme: dark;
+  height: 100%;
+  font-size: 14px;
+  line-height: 1.5;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Text',
+    Inter,
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+.ant-app {
+  height: 100%;
+}
+
+// 全局滚动条精修（暗色）
+.scrollbar-style {
+  scrollbar-width: thin;
+  scrollbar-color: #3d4045 transparent;
+}
+.scrollbar-style::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-style::-webkit-scrollbar-thumb {
+  background: #3d4045;
+  border-radius: 4px;
+
+  &:hover {
+    background: #4a4d54;
+  }
+}
+

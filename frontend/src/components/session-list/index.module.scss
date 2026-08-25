@@ -1,0 +1,151 @@
+.sessionList {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+.header {
+  flex-shrink: 0;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ececec;
+  }
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+  }
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #7d8086;
+
+  p {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 0 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: relative;
+
+  &:hover {
+    background: #26282d;
+
+    .actions {
+      opacity: 1;
+    }
+  }
+
+  &.active {
+    background: #32353b;
+  }
+}
+
+.itemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ececec;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.item.active .itemTitle {
+  color: #ececec;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #7d8086;
+}
+
+// 按天分组标题（今天 / 昨天 / N天前）
+.dayGroup {
+  padding: 12px 16px 4px;
+  font-size: 12px;
+  color: #7d8086;
+}
+
+.messageCount {
+  flex-shrink: 0;
+}
+
+.time {
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.actionBtn {
+  padding: 4px 8px;
+  color: #a6a8ad;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ececec;
+  }
+}
+
+// 新建对话按钮：灰阶胶囊（不用蓝色）
+.newChatBtn {
+  border-radius: 999px;
+  background: #26282d;
+  border: 1px solid #34373c;
+  color: #a6a8ad;
+
+  &:hover {
+    background: #2b2e33;
+    border-color: #3d4045;
+    color: #ececec;
+  }
+}

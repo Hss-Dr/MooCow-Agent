@@ -1,0 +1,154 @@
+.com-sender {
+  .com-sender__main {
+    background-color: #2b2e33;
+    border-radius: 16px;
+    border: 1px solid #34373c;
+    box-shadow: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+
+    &:focus-within {
+      border-color: #4a4d54;
+      box-shadow: none;
+    }
+
+    .ant-input {
+      background: transparent;
+      border: none;
+      padding: 18px 20px 8px;
+      box-shadow: none;
+      font-size: 15px;
+      line-height: 1.6;
+
+      &::placeholder {
+        color: #7d8086;
+      }
+    }
+  }
+
+  .com-sender__actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px 12px;
+
+    .ant-btn {
+      --ant-button-padding-inline: 12px;
+      border-radius: 999px; // 胶囊按钮（DeepSeek 风格）
+
+      &.ant-btn-variant-filled {
+        border: solid 1px var(--ant-color-primary-border);
+      }
+
+      &.ant-btn-variant-outlined {
+        color: #a6a8ad;
+        border-color: #3d4045;
+        background: #26282d;
+
+        &:hover {
+          color: #ececec;
+          border-color: #4a4d54;
+          background: #383b41;
+        }
+      }
+
+      // 激活态胶囊：浅蓝底提示选中（DeepSeek 同款交互）
+      &.com-sender__toggle-active {
+        background: rgba(77, 107, 254, 0.25);
+        color: #c9d4ff;
+        border-color: rgba(77, 107, 254, 0.45);
+
+        &:hover {
+          background: rgba(77, 107, 254, 0.32);
+          color: #dbe3ff;
+          border-color: rgba(77, 107, 254, 0.55);
+        }
+      }
+
+      &.btn-send {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 50%;
+
+        &.ant-btn-variant-filled {
+          border: solid 1px transparent;
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+          -webkit-user-drag: none;
+        }
+      }
+
+      // 停止键（生成中替代发送键，Kimi 风格：灰色圆钮 + 白色方块）
+      &.btn-stop {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 50%;
+        background: #4a4d54;
+        border: none;
+
+        .btn-stop__square {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          background: #ececec;
+          border-radius: 2px;
+        }
+
+        &:hover {
+          background: #5a5e6a;
+        }
+      }
+    }
+  }
+
+  .com-sender__footer {
+    margin-top: 20px;
+    color: #a6a8ad;
+
+    .ant-switch {
+      --ant-switch-track-height: 30px;
+      --ant-switch-handle-size: 26px;
+      --ant-switch-track-min-width: 56px;
+    }
+  }
+
+  .com-sender__files {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    .com-sender__file {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background-color: #26282d;
+      border: 1px solid #3d4045;
+      border-radius: 10px;
+      max-width: 50%;
+
+      .com-sender__file-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
+        object-fit: cover;
+      }
+
+      .com-sender__file-icon {
+        flex-shrink: 0;
+      }
+
+      .com-sender__file-name {
+        color: #a6a8ad;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}

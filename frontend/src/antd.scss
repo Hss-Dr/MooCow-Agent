@@ -1,0 +1,13 @@
+.ant-btn-color-primary.ant-btn-variant-text {
+  --ant-color-link: var(
+    --ant-color-primary
+  ); //  antd 错误地将 text/primary 颜色设为了 ant-color-link
+}
+
+.ant-dropdown-menu {
+  color: white;
+  background-color: #2b2e33;
+  --ant-color-bg-elevated: #2b2e33;
+  --ant-color-text: #ececec;
+  --ant-control-item-bg-hover: rgba(255, 255, 255, 0.08);
+}

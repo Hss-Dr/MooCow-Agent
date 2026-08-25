@@ -1,0 +1,20 @@
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+pymysql
+DBUtils
+openai>=1.0.0
+httpx>=0.25.0
+openai-agents
+# 注意:mcp 必须 <2。mcp 2.x 默认用 server/discover 新协议(protocolVersion 2026-07-28),
+# DashScope 百炼 WebSearch MCP 只支持旧版 initialize 协议(2024-11-05),会返回 500。
+mcp<2
+pystun3
+psycopg2-binary
+redis
+sqlalchemy>=2.0.0
+bcrypt>=4.0.0
+fastapi-jwt>=0.3.0
+python-jose[cryptography]>=3.3.0

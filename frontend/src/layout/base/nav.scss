@@ -1,0 +1,100 @@
+.base-layout-nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: transparent;
+
+  // 品牌 Logo（原顶栏移入侧边栏顶部）
+  &__logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 16px 12px;
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: #4d6bfe;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .logo-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ececec;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__user {
+    cursor: pointer;
+
+    &:hover {
+      background: #26282d;
+    }
+  }
+
+  &__menu {
+    flex-shrink: 0;
+    padding: 12px 8px 4px;
+
+    .ant-menu {
+      background: transparent;
+    }
+
+    .ant-menu-item {
+      border-radius: 8px;
+      margin: 4px 0;
+      height: 40px;
+      line-height: 40px;
+      color: #a6a8ad;
+
+      &:hover {
+        background-color: #26282d;
+        color: #ececec;
+      }
+    }
+
+    .ant-menu-item-selected {
+      background-color: #32353b;
+      color: #ececec;
+      font-weight: 500;
+
+      &:hover {
+        background-color: #32353b;
+        color: #ececec;
+      }
+    }
+  }
+
+  &__sessions {
+    flex: 1;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  &__user {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #0d0e11;
+
+    .username {
+      font-size: 14px;
+      color: #ececec;
+      font-weight: 500;
+    }
+  }
+}

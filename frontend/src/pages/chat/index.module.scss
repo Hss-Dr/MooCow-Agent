@@ -1,0 +1,273 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 24px 12px;
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #3d4045;
+    border-radius: 3px;
+
+    &:hover {
+      background: #4a4d54;
+    }
+  }
+}
+
+// 消息列：居中限宽（DeepSeek 风格）
+.messagesInner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.loading,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+}
+
+// 欢迎页（空会话状态）
+.empty {
+  .emptyLogo {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .emptyTitle {
+    font-size: 26px;
+    font-weight: 600;
+    color: #ececec;
+    margin: 0 0 10px;
+  }
+
+  .emptySub {
+    font-size: 15px;
+    color: #7d8086;
+    margin: 0;
+  }
+}
+
+.message {
+  display: flex;
+  margin-bottom: 28px;
+  animation: fadeIn 0.3s ease-in;
+
+  // 用户消息：右侧灰蓝气泡（DeepSeek 同款，四角均匀圆角无尖角）
+  &.user {
+    justify-content: flex-end;
+
+    .messageContent {
+      max-width: 85%;
+      background: #292929;
+      color: #ececec;
+      padding: 10px 16px;
+      border-radius: 12px;
+    }
+
+    .messageText {
+      font-size: 15px;
+      white-space: pre-wrap;
+    }
+
+    .messageTime {
+      opacity: 0.45;
+    }
+  }
+
+  // 助手消息：全宽展示（无气泡），左侧渐变 Logo 头像
+  &.assistant {
+    justify-content: flex-start;
+    gap: 12px;
+
+    .messageContent {
+      flex: 1;
+      min-width: 0; // 防止内容撑破 flex 布局
+      padding: 2px 0 0;
+      background: transparent;
+      color: #ececec;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .messageText {
+      font-size: 15px;
+    }
+  }
+}
+
+// 助手头像：thinking-orbs 球体（缩放到 40px 视觉尺寸，中心对齐思考块标题行）
+// 64px canvas 在 40px 容器内 flex 居中会视觉上移 12px，用 margin-top 12 补偿
+.avatarOrb {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin-top: 12px;
+  margin-left: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 库只提供 64/20 两档尺寸，64 档用 transform 缩到 40px
+.orbScaled {
+  display: inline-block;
+  transform: scale(0.625);
+  transform-origin: top left;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.messageText {
+  font-size: 14px;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.messageTime {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.messageActions {
+  margin-top: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.message:hover .messageActions {
+  opacity: 1;
+}
+
+// 底部输入区：透明底、内容居中限宽
+.sender {
+  flex-shrink: 0;
+  padding: 8px 24px 20px;
+  width: 100%;
+  background: transparent;
+  border-top: none;
+}
+
+.senderInner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+// 参考来源标记（RAG 检索命中的文档，点击胶囊展开片段）
+.sourcesWrap {
+  margin-top: 10px;
+}
+
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.sourcesLabel {
+  font-size: 12px;
+  color: #7d8086;
+}
+
+.sourceChip {
+  font-size: 12px;
+  color: #a6a8ad;
+  background: #26282d;
+  border: 1px solid #34373c;
+  border-radius: 999px;
+  padding: 3px 10px;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover {
+    color: #ececec;
+    border-color: #4a4d54;
+  }
+}
+
+.sourceChipActive {
+  color: #ececec;
+  border-color: #4d6bfe;
+  background: #2b2e33;
+}
+
+.sourceDetail {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #26282d;
+  border: 1px solid #34373c;
+  border-radius: 8px;
+}
+
+.sourceDetailTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ececec;
+  margin-bottom: 6px;
+}
+
+.sourceDetailContent {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a6a8ad;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+// 流式等待时的打字光标
+.typingCursor::after {
+  content: '▍';
+  color: #ececec;
+  font-size: 16px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}

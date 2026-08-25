@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#1a1d24"/>
+  <g>
+    <circle cx="22.5" cy="24.0" r="1.5" fill="#8a8e94"/><circle cx="28.8" cy="24.0" r="1.5" fill="#8a8e94"/><circle cx="35.2" cy="24.0" r="1.5" fill="#8a8e94"/><circle cx="41.5" cy="24.0" r="1.5" fill="#8a8e94"/><circle cx="21.0" cy="29.0" r="1.5" fill="#8a8e94"/><circle cx="28.3" cy="29.0" r="1.5" fill="#8a8e94"/><circle cx="35.7" cy="29.0" r="1.5" fill="#8a8e94"/><circle cx="43.0" cy="29.0" r="1.5" fill="#8a8e94"/><circle cx="20.9" cy="34.0" r="1.5" fill="#8a8e94"/><circle cx="28.3" cy="34.0" r="1.5" fill="#8a8e94"/><circle cx="35.7" cy="34.0" r="1.5" fill="#8a8e94"/><circle cx="43.1" cy="34.0" r="1.5" fill="#8a8e94"/><circle cx="22.1" cy="39.0" r="1.5" fill="#8a8e94"/><circle cx="28.7" cy="39.0" r="1.5" fill="#8a8e94"/><circle cx="35.3" cy="39.0" r="1.5" fill="#8a8e94"/><circle cx="41.9" cy="39.0" r="1.5" fill="#8a8e94"/>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="2.4s" repeatCount="indefinite"/>
+    <circle cx="32" cy="32" r="15" fill="none" stroke="#4d6bfe" stroke-width="2.5" stroke-dasharray="24 70" stroke-linecap="round"/>
+  </g>
+</svg>

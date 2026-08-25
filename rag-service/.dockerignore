@@ -1,0 +1,21 @@
+# 敏感配置（通过 env_file 注入，不打进镜像）
+.env
+
+# 数据库初始化脚本（由 postgres 容器挂载执行）
+init.sql
+
+# 编排文件
+docker-compose.yml
+
+# 文档
+README.md
+
+# Python 缓存
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.pytest_cache
+
+# 版本控制
+.git
+.gitignore

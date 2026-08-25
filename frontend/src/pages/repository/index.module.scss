@@ -1,0 +1,98 @@
+.repository-page {
+  height: 100%;
+  overflow-y: auto;
+  background: #000000;
+  padding: 24px;
+  box-sizing: border-box;
+
+  // 内容居中限宽（与对话页右栏同规格）
+  &__inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  &__header {
+    margin-bottom: 28px;
+
+    .title {
+      font-size: 26px;
+      font-weight: 600;
+      color: #ececec;
+      letter-spacing: 0.5px;
+    }
+
+    .desc {
+      font-size: 15px;
+      color: #7d8086;
+      margin-top: 8px;
+    }
+  }
+
+  &__body {
+    .header {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+  }
+
+  &__file-name {
+    color: #ececec;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+      vertical-align: -0.25em;
+    }
+  }
+
+  // 添加文件按钮：灰阶胶囊（同新建对话按钮）
+  .addBtn {
+    border-radius: 999px;
+    background: #26282d;
+    border: 1px solid #34373c;
+    color: #ececec;
+
+    &:hover {
+      background: #2b2e33;
+      border-color: #3d4045;
+      color: #ececec;
+    }
+  }
+
+  // 表格：扁平黑底（去卡片感）
+  :global(.ant-table) {
+    background: transparent;
+  }
+
+  :global(.ant-table-thead > tr > th) {
+    background: transparent;
+    border-bottom: 1px solid #26282d;
+    color: #7d8086;
+    font-weight: 500;
+    padding: 12px 16px;
+  }
+
+  :global(.ant-table-tbody > tr > td) {
+    border-bottom: 1px solid #1f222a;
+    padding: 14px 16px;
+    color: #a6a8ad;
+  }
+
+  :global(.ant-table-tbody > tr:hover > td) {
+    background: #141519 !important;
+  }
+
+  :global(.ant-table-cell::before) {
+    display: none; // 去掉 antd 表格列的竖分割线
+  }
+
+  :global(.ant-checkbox-wrapper) {
+    margin: 0;
+  }
+}

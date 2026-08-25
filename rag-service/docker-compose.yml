@@ -1,0 +1,100 @@
+version: '3.8'
+services:
+  moocowagent_rag:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    hostname: moocowagent_rag
+    container_name: moocowagent_rag
+    environment:
+      - HF_ENDPOINT=https://hf-mirror.com
+      - DATABASE_URL=postgresql://postgres:pg123456@gsk_pg:5432/gsk
+      - ES_HOST=http://es01:9200
+      - ROOT_PATH=http://localhost:8001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    ports:
+      - "8001:8001"  # 修改为8001端口，避免与其他服务冲突
+    volumes:
+      - ./app:/app/app
+    command: ["uvicorn", "app_main:app", "--host", "0.0.0.0", "--port", "8001"]
+    restart: unless-stopped
+    depends_on:
+      - gsk_pg
+      - es01
+      - redis
+    networks:
+      - gsk_network
+
+  es01:
+    container_name: gsk-es-01
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    volumes:
+      - gsk_esdata01:/usr/share/elasticsearch/data
+    env_file: .env
+    environment:
+      - node.name=es01
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=false
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - cluster.routing.allocation.disk.watermark.low=5gb
+      - cluster.routing.allocation.disk.watermark.high=3gb
+      - cluster.routing.allocation.disk.watermark.flood_stage=2gb
+      - TZ=${TIMEZONE}
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    mem_limit: ${MEM_LIMIT}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    restart: on-failure
+    networks:
+      - gsk_network
+
+  gsk_pg:
+    container_name: gsk_pg
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=pg123456
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=gsk
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - gsk_network
+
+  redis:
+    container_name: gsk_redis
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - gsk_network
+
+volumes:
+  gsk_esdata01:
+    driver: local
+  pg_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  gsk_network:
+    driver: bridge

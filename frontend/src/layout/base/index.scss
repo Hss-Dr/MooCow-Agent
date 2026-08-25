@@ -1,0 +1,41 @@
+.base-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+
+  > main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+.base-layout__sidebar {
+  flex-shrink: 0;
+  width: 280px;
+  height: 100%;
+  border-right: 1px solid #26282d;
+  background: #0d0e11;
+
+  .base-layout__sidebar-main {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .base-layout__sidebar-main-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.base-layout__content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

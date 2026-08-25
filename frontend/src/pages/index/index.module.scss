@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #000000;
+}
+
+.logo {
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
+  background: #4d6bfe;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  
+  animation: float 3s ease-in-out infinite;
+}
+
+.title {
+  margin: 24px 0 8px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ececec;
+  letter-spacing: 0.5px;
+}
+
+.sub {
+  margin: 0 0 28px;
+  font-size: 14px;
+  color: #7d8086;
+}
+
+.spin {
+  :global(.ant-spin-dot) {
+    color: #a6a8ad;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

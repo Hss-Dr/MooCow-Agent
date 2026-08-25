@@ -1,0 +1,146 @@
+.thinkingBlock {
+  margin-bottom: 8px;
+  border: 1px solid #34373c;
+  border-radius: 10px;
+  overflow: hidden;
+  background: transparent;
+  transition: background 0.2s, border-color 0.2s;
+
+  // Kimi 风格：仅画框，hover 时才浮现浅灰底
+  &:hover {
+    background: #26282d;
+    border-color: #3d4045;
+  }
+
+  // 展开状态保持浅灰底（内容需要对比）
+  &.expanded {
+    background: #26282d;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #26282d;
+  }
+}
+
+.icon {
+  color: #a6a8ad;
+  font-size: 14px;
+}
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+  font-size: 13px;
+  color: #a6a8ad;
+  font-weight: 500;
+}
+
+.arrow {
+  font-size: 10px;
+  color: #7d8086;
+  transition: transform 0.2s;
+}
+
+.content {
+  padding: 0 12px 12px;
+  border-top: 1px solid #34373c;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.thinkingSection {
+  margin-top: 10px;
+}
+
+.text {
+  font-size: 13px;
+  color: #a6a8ad;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.processSection {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #a6a8ad;
+  line-height: 1.5;
+
+  // 后端注入的 PROCESS 卡片 HTML（紧凑卡片样式）
+  :global(.tech-process-card) {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    background: #26282d;
+    border: 1px solid #34373c;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #a6a8ad;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  :global(.tech-process-header) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  :global(.tech-icon) {
+    font-size: 12px;
+  }
+
+  :global(.tech-label) {
+    font-weight: 500;
+    color: #a6a8ad;
+  }
+
+  :global(.tech-process-flow) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  :global(.tech-node) {
+    padding: 1px 8px;
+    background: #32353b;
+    color: #ececec;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  :global(.tech-arrow) {
+    color: #7d8086;
+    font-size: 12px;
+  }
+
+  :global(.tech-text) {
+    font-size: 12px;
+    color: #a6a8ad;
+  }
+
+  :global(.highlight) {
+    color: #ececec;
+    font-weight: 500;
+  }
+}

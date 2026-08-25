@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 日志（运行时生成）
+logs/
+*.log
+
+# 运行时数据（使用volume挂载）
+storage/
+user_memories/
+
+# Git
+.git/
+.gitignore
+
+# 文档
+README.md
+*.md
+
+# 例外：运行必需的系统提示词与 Skill 文件必须进镜像（生产模式无挂载）
+!prompts/*.md
+!skills/**/*.md
+
+# 其他
+.DS_Store

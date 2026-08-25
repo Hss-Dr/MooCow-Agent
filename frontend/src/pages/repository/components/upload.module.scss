@@ -1,0 +1,17 @@
+.repository-upload {
+  :global {
+    .ant-upload-drag {
+      --ant-color-fill-alter: transparent;
+      height: 200px;
+    }
+
+    .ant-upload-list-item-progress {
+      display: none;
+    }
+  }
+
+  .repository-upload__desc {
+    font-size: 12px;
+    color: #7d8086;
+  }
+}
