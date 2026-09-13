@@ -9,11 +9,14 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 更新时间
 );
 
--- 创建会话表
+-- 创建会话表（与 backend/models/session.py 保持一致）
 CREATE TABLE IF NOT EXISTS sessions (
     session_id VARCHAR(16) PRIMARY KEY,
-    session_name VARCHAR(255) NOT NULL,  
-    user_id VARCHAR(255) NOT NULL,
+    session_name VARCHAR(255) NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message_count INTEGER NOT NULL DEFAULT 0,          -- 统计缓存
+    last_message_at TIMESTAMP,                          -- 最后消息时间
+    file_path VARCHAR(255) NOT NULL DEFAULT '',         -- JSONL文件路径
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP  -- 更新时间
 );
@@ -21,6 +24,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 -- 创建索引
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_created_at  ON sessions(created_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_last_message_at ON sessions(last_message_at);
 
 -- 创建 messages 表
 CREATE TABLE IF NOT EXISTS messages (

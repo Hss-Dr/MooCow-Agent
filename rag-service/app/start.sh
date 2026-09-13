@@ -44,13 +44,13 @@ try:
     with engine.connect() as conn:
         result = conn.execute(text(\"SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'alembic_version')\"))
         table_exists = result.scalar()
-        
+
+        alembic_cfg = Config('alembic.ini')
         if not table_exists:
             print('首次部署，标记baseline...')
-            alembic_cfg = Config('alembic.ini')
             command.stamp(alembic_cfg, '980b32f130df')
             print('Baseline标记完成')
-        
+
         print('运行数据库迁移...')
         command.upgrade(alembic_cfg, 'head')
         print('数据库迁移完成!')
