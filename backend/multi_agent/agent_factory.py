@@ -4,6 +4,7 @@ from agents.run import RunConfig
 from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client, baidu_mcp_client
+from infrastructure.clients.rag_client import rag_client
 
 from infrastructure.logging.logger import logger
 
@@ -29,10 +30,61 @@ async def consult_technical_expert(
         logger.info(f"[Route] 转交技术专家: {query[:30]}...")
         logger.info(f"[Route] 开始运行技术专家...")
 
-        # 直接透传用户指令，不要做任何加工；context 透传（含 user_id 供 RAG 工具使用）
+        # ============================================================
+        # 平台级强制预检索：产品/参数/售后类问题必须先查知识库。
+        # 之前依赖模型自觉调用 query_rag_knowledge，模型经常跳过
+        # 直接联网搜索，导致"已上传文档却检索不到"。这里在运行
+        # Agent 前强制检索一次，有结果直接注入输入上下文。
+        # ============================================================
+        ctx = tool_context.context
+        user_id = ctx.get("user_id") if isinstance(ctx, dict) else None
+        agent_input = query
+
+        try:
+            kb_result = await rag_client.retrieve_documents(
+                question=query,
+                user_id=user_id
+            )
+            documents = kb_result.get("documents", []) or []
+            total = kb_result.get("total", 0)
+
+            if kb_result.get("status") == "success" and documents:
+                # 写入运行上下文，供上层组装"参考来源"返回给前端
+                if isinstance(ctx, dict):
+                    ctx["retrieved_docs"] = [
+                        {
+                            "id": doc.get("document_id", ""),
+                            "title": doc.get("document_name", "未知文档"),
+                            "content": (doc.get("content_with_weight") or "")[:500],
+                        }
+                        for doc in documents
+                    ]
+
+                # 组装注入上下文（每篇截断 800 字，最多 5 篇，控制 prompt 体积）
+                parts = []
+                for i, doc in enumerate(documents[:5], 1):
+                    name = doc.get("document_name", "未知文档")
+                    content = (doc.get("content_with_weight") or "")[:800]
+                    parts.append(f"[文档{i}] 《{name}》\n{content}")
+
+                kb_block = "\n\n".join(parts)
+                agent_input = (
+                    f"用户问题：{query}\n\n"
+                    f"以下是知识库中检索到的 {total} 个相关文档片段，"
+                    f"【必须优先基于这些内容回答，严禁编造参数/价格】：\n\n{kb_block}\n\n"
+                    f"若知识库内容不足以回答，再调用 bailian_web_search 联网搜索并注明来源。"
+                )
+                logger.info(f"[Route] 知识库预检索命中 {total} 个片段，已注入技术专家上下文")
+            else:
+                logger.info(f"[Route] 知识库预检索无结果（{total}），按正常流程处理")
+        except Exception as e:
+            # 预检索失败不阻断主流程，降级为原逻辑
+            logger.warning(f"[Route] 知识库预检索失败（降级为原流程）: {e}")
+
+        # context 透传（含 user_id 供 RAG 工具使用）
         result = await Runner.run(
             technical_agent,
-            input=query,
+            input=agent_input,
             context=tool_context.context,
             run_config=RunConfig(tracing_disabled=True)
         )

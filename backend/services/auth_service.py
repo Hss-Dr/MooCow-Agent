@@ -3,7 +3,7 @@ JWT认证服务
 
 提供用户注册、登录、token生成等功能
 """
-from fastapi import Depends
+from fastapi import Depends, HTTPException, Request, status
 from fastapi_jwt import JwtAccessBearerCookie, JwtAuthorizationCredentials
 from datetime import timedelta
 from utils.password import hash_password, verify_password
@@ -101,13 +101,18 @@ def authenticate(username: str, password: str, db: DBSession) -> str:
 
 def get_current_user_id(
     credentials: JwtAuthorizationCredentials = Depends(access_security),
-    db: DBSession = Depends(get_db)
+    db: DBSession = Depends(get_db),
+    request: Request = None,
 ) -> int:
     """
     获取当前用户ID（支持可选认证）
 
     如果请求携带有效token，返回token中的user_id；
     否则返回default_user的ID（向后兼容）
+
+    关键修复：请求带了 Authorization 头但 token 无效（过期/密钥更换）时，
+    明确返回 401 让前端跳转登录页，而不是静默按匿名处理——
+    否则会出现"上传进 default_user 索引、检索却查数字ID索引"的错位。
 
     Args:
         credentials: JWT认证凭证
@@ -118,6 +123,13 @@ def get_current_user_id(
     """
     if credentials:
         return credentials.subject["user_id"]
+
+    # 带了 token 但解析失败：登录已失效，明确报 401（前端会自动跳登录页）
+    if request is not None and request.headers.get("Authorization"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="登录已过期，请重新登录",
+        )
 
     # 未认证时，查找或创建default_user
     default_user = db.query(User).filter(User.username == "default_user").first()

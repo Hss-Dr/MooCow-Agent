@@ -24,14 +24,15 @@ services:
       # 数据库配置（容器内通信）
       - DATABASE_URL=postgresql://postgres:pg123456@gsk_pg:5432/gsk
 
-      # JWT认证（与RAG服务共享密钥）
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-default_secret_key}
-
       # 应用配置
       - APP_ENV=production
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
+    env_file:
+      # JWT密钥等敏感配置来自 backend/.env（与RAG服务共享同一JWT_SECRET_KEY）
+      # 注意：environment 中显式列出的变量优先于 env_file（如容器内的 DATABASE_URL）
+      - ./backend/.env
     volumes:
       # 持久化存储
       - ./backend/logs:/app/logs

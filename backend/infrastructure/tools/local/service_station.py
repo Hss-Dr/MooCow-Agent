@@ -176,6 +176,70 @@ async def resolve_user_location_from_text(
     }, ensure_ascii=False)
 
 
+def bd09_to_gcj02(lng: float, lat: float) -> tuple[float, float]:
+    """
+    [工具函数] 百度坐标系 (BD09) 转 高德坐标系 (GCJ02)
+    来源：https://github.com/wandergis/coordTransform_py/blob/master/coordTransform_utils.py
+    """
+    x_pi = math.pi * 3000.0 / 180.0
+    x = lng - 0.0065
+    y = lat - 0.006
+    z = math.sqrt(x * x + y * y) - 0.00002 * math.sin(y * x_pi)
+    theta = math.atan2(y, x) - 0.000003 * math.cos(x * x_pi)
+    gcj_lng = z * math.cos(theta)
+    gcj_lat = z * math.sin(theta)
+    return gcj_lng, gcj_lat
+
+
+@function_tool
+def build_amap_navigation_link(
+        origin_name: str,
+        origin_lat: float,
+        origin_lng: float,
+        destination_name: str,
+        destination_lat: float,
+        destination_lng: float,
+        mode: str = "car",
+) -> str:
+    """
+    生成高德地图网页版导航链接（浏览器打开后直接显示起点→终点的路线规划）。
+
+    为什么用高德：
+    - 百度 MCP 的 map_uri direction 模式返回的链接带 src=webapp.baidu.openAPIdemo
+      演示参数，浏览器打开无法显示路线（已实测验证）。
+    - 高德 URI API 无需密钥，浏览器打开即可看到已填好起点终点的路线规划页。
+
+    Args:
+        origin_name (str): 起点名称（如"我的位置"）
+        origin_lat (float): 起点纬度 (BD09LL，来自 resolve_user_location_from_text)
+        origin_lng (float): 起点经度 (BD09LL)
+        destination_name (str): 终点名称
+        destination_lat (float): 终点纬度 (BD09LL)
+        destination_lng (float): 终点经度 (BD09LL)
+        mode (str): 导航模式 car=驾车 / walk=步行 / transit=公交，默认 car
+
+    Returns:
+        str: 高德导航链接（uri.amap.com/navigation）
+    """
+    from urllib.parse import quote
+
+    # 1. BD09 -> GCJ02（高德坐标系），坐标转换不能在 LLM 里做，必须在代码里确定性完成
+    gcj_origin_lng, gcj_origin_lat = bd09_to_gcj02(origin_lng, origin_lat)
+    gcj_dest_lng, gcj_dest_lat = bd09_to_gcj02(destination_lng, destination_lat)
+
+    # 2. 导航模式映射（高德 URI API 的 mode 取值）
+    mode_map = {"car": "car", "walk": "walk", "transit": "bus"}
+    amap_mode = mode_map.get(mode, "car")
+
+    # 3. 组装链接（lng,lat,name 顺序，名称需 URL 编码）
+    from_param = f"{gcj_origin_lng:.6f},{gcj_origin_lat:.6f},{quote(origin_name)}"
+    to_param = f"{gcj_dest_lng:.6f},{gcj_dest_lat:.6f},{quote(destination_name)}"
+    link = f"https://uri.amap.com/navigation?from={from_param}&to={to_param}&mode={amap_mode}&coordinate=gaode"
+
+    logger.info(f"[AmapNav] 生成导航链接: {link}")
+    return link
+
+
 @function_tool
 def query_nearest_repair_shops_by_coords(lat: float, lng: float, limit: int = 3) -> str:
     """

@@ -3,7 +3,7 @@
 
 提供文件上传、列表、删除功能，并与RAG服务集成
 """
-from fastapi import APIRouter, UploadFile, File, Query, HTTPException, Form, Security
+from fastapi import APIRouter, UploadFile, File, Query, HTTPException, Form, Security, Request, status
 from typing import List, Optional
 import os
 from pathlib import Path
@@ -27,7 +27,8 @@ async def upload_files(
     session_id: Optional[str] = Query(default="default"),
     user_id: Optional[str] = Query(default="default_user"),
     scope: Optional[str] = Query(default="personal", description="personal=个人私有库(默认); shared=公共共享库(仅管理员)"),
-    credentials: Optional[JwtAuthorizationCredentials] = Security(access_security)
+    credentials: Optional[JwtAuthorizationCredentials] = Security(access_security),
+    request: Request = None
 ):
     """
     上传文件到知识库
@@ -42,6 +43,14 @@ async def upload_files(
         上传结果
     """
     try:
+        # 带了 token 但无效（过期/密钥更换）：明确 401，避免静默按匿名入库到错误索引
+        if (credentials is None or credentials.subject.get("user_id") is None) \
+                and request is not None and request.headers.get("Authorization"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="登录已过期，请重新登录"
+            )
+
         # 以已验证的 JWT 身份为准，避免伪造 user_id 冒充他人/管理员
         if credentials and credentials.subject.get("user_id") is not None:
             user_id = str(credentials.subject.get("user_id"))
@@ -105,7 +114,8 @@ async def upload_files(
 @router.get("/get_files/")
 async def get_files(
     user_id: str = Query(default="default_user"),
-    credentials: Optional[JwtAuthorizationCredentials] = Security(access_security)
+    credentials: Optional[JwtAuthorizationCredentials] = Security(access_security),
+    request: Request = None
 ):
     """
     获取用户的文件列表
@@ -118,6 +128,14 @@ async def get_files(
         文件列表
     """
     try:
+        # 带了 token 但无效（过期/密钥更换）：明确 401，避免静默按匿名处理
+        if (credentials is None or credentials.subject.get("user_id") is None) \
+                and request is not None and request.headers.get("Authorization"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="登录已过期，请重新登录"
+            )
+
         # 以已验证的 JWT 身份为准（修复：登录用户看不到自己文件的问题）
         if credentials and credentials.subject.get("user_id") is not None:
             user_id = str(credentials.subject.get("user_id"))
@@ -169,7 +187,8 @@ async def get_files(
 async def delete_file(
     file_name: str = Query(...),
     user_id: str = Query(default="default_user"),
-    credentials: Optional[JwtAuthorizationCredentials] = Security(access_security)
+    credentials: Optional[JwtAuthorizationCredentials] = Security(access_security),
+    request: Request = None
 ):
     """
     删除文件
@@ -183,6 +202,14 @@ async def delete_file(
         删除结果
     """
     try:
+        # 带了 token 但无效（过期/密钥更换）：明确 401，避免静默按匿名处理
+        if (credentials is None or credentials.subject.get("user_id") is None) \
+                and request is not None and request.headers.get("Authorization"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="登录已过期，请重新登录"
+            )
+
         # 以已验证的 JWT 身份为准
         if credentials and credentials.subject.get("user_id") is not None:
             user_id = str(credentials.subject.get("user_id"))
