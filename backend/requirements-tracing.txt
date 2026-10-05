@@ -1,0 +1,5 @@
+# Phoenix 可观测性（Agent 追踪）：OpenInference 官方 openai-agents 插桩 + OTel 导出
+# 独立于 requirements.txt，Dockerfile 中单独安装层，更新追踪依赖时无需重装全部依赖
+openinference-instrumentation-openai-agents
+opentelemetry-sdk
+opentelemetry-exporter-otlp

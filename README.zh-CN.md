@@ -4,7 +4,7 @@
 
 ### 新能源汽车全链路智能助手 · 多智能体 + Skill 插件 + RAG 知识库
 
-**从售前咨询到售后救援，一个助手全程领航。**
+**从售前咨询到售后服务，一个助手全程领航。**
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -14,6 +14,7 @@
 [![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek_V4_Pro-4D6BFE)](https://www.deepseek.com/)
 [![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.11-FEC514?logo=elasticsearch&logoColor=black)](https://www.elastic.co/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![Phoenix](https://img.shields.io/badge/Phoenix-Agent_Tracing-EB4E3D)](https://phoenix.arize.com/)
 
 [English](README.md) · **简体中文**
 
@@ -55,7 +56,7 @@ cd moocow-agent
 脚本会自动完成：
 
 1. 从 `.env.example` 生成缺失的 `.env` 配置
-2. 构建并启动全部 Docker 服务（后端 / RAG / ES / PG / Redis）
+2. 构建并启动全部 Docker 服务（后端 / RAG / ES / PG / Redis / Phoenix）
 3. 安装前端依赖并后台启动 dev server
 
 启动完成后访问：
@@ -65,6 +66,7 @@ cd moocow-agent
 | 前端界面 | http://localhost:5181 |
 | 后端 API | http://localhost:8080/docs |
 | RAG 服务 | http://localhost:8001/docs |
+| Phoenix(Agent 观测) | http://localhost:6006 |
 
 > ⚠️ **首次启动前唯一需要做的事**：编辑 `backend/.env`，填入真实的模型 API Key（占位符密钥下服务可启动但对话不可用）。
 
@@ -106,7 +108,7 @@ cd frontend && npm install && npm run dev
 
 - **双库检索**：公司公共库（`company_kb`）+ 用户个人库，一次查询合并召回
 - **三级排序链路**：ES RRF 融合粗排（BM25 + KNN）→ SiliconFlow `bge-reranker-v2-m3` 语义精排 → 本地混合相似度兜底
-- **文档管理**：上传 → deepdoc 解析（ONNX 模型）→ 入库，全流程可视化
+- **文档管理**：上传 → 解析（ONNX 模型）→ 入库，全流程可视化
 - **回答溯源**：引用文档显示在回答下方，点击可展开检索片段原文
 
 ### 沉浸式对话体验
@@ -115,6 +117,12 @@ cd frontend && npm install && npm run dev
 - 深色主题：按 DeepSeek 深色模式设计，纯黑底 + 灰阶层次 + 单一品牌蓝
 - 思考可视化：thinking-orbs 点阵球动画（空闲 `solving` / 生成中 `working`）、输入框流动光束
 - 按天分组的会话列表、停止生成、重新生成、一键复制
+
+### Agent 可观测性（Phoenix）
+
+- **每次对话 = 一条 trace**：主调度 → 路由工具 → 子智能体 → 工具调用（RAG 检索、联网搜索、地图、Skill 加载）完整 span 树
+- **span 级明细**：模型名、LLM token 消耗（输入/输出）、耗时、工具输入输出
+- 自托管 [Arize Phoenix](https://phoenix.arize.com/)：http://localhost:6006 —— 基于 OpenInference / OpenTelemetry 标准，未来可无损切换到任意 OTLP 兼容后端
 
 ## 🏗️ 系统架构
 
@@ -133,15 +141,15 @@ cd frontend && npm install && npm run dev
 │  · 服务站专家：百度地图导航                                  │
 │  · Skill 加载器：sales · aftersales                         │
 │  · RAG 客户端 · 联网搜索 MCP（DashScope WebSearch）          │
-└─────────────┬───────────────────────────────┬───────────────┘
-              │                               │
-┌─────────────▼─────────────┐   ┌─────────────▼───────────────┐
-│  RAG 服务（moocowagent_rag）      │   │  基础设施                   │
-│  · 混合检索（公共库+个人库）│   │  · Elasticsearch 8.11       │
-│  · RRF 融合粗排            │   │  · PostgreSQL 15            │
-│  · Rerank 语义精排         │   │  · Redis 7                  │
-│  · deepdoc 文档解析        │   │                             │
-└───────────────────────────┘   └─────────────────────────────┘
+└─────────┬───────────────────────┬──────────────────────┬───────┘
+          │                       │                      │ OTLP
+┌─────────▼─────────┐   ┌─────────▼───────────┐   ┌──────▼──────────────────┐
+│  RAG 服务          │   │  基础设施            │   │  Phoenix（Agent 观测）  │
+│  · 混合检索        │   │  · Elasticsearch 8.11│  │  · Agent 调用链 span 树  │
+│  · RRF 融合粗排    │   │  · PostgreSQL 15    │   │  · LLM token 与耗时     │
+│  · Rerank 语义精排 │   │  · Redis 7          │   │  · 自托管 SQLite 持久化  │
+│  · deepdoc 文档解析│   │                     │   │    （OpenInference/OTel）│
+└───────────────────┘   └─────────────────────┘   └──────────────────────────┘
 ```
 
 ## 🧩 Skill 插件机制
@@ -183,7 +191,7 @@ moocow-agent/
 │   ├── multi_agent/       # 主调度 / 全链路 / 服务站 Agent
 │   ├── prompts/           # 系统提示词
 │   ├── skills/            # ★ Skill 插件（销售 / 售后）
-│   ├── infrastructure/    # AI 客户端 / Skill 加载器 / 本地工具 / MCP
+│   ├── infrastructure/    # AI 客户端 / Skill 加载器 / 本地工具 / MCP / 追踪（Phoenix）
 │   ├── api/               # 路由（auth / chat / session / repository）
 │   └── services/          # 业务服务（流式响应 / 会话）
 ├── rag-service/           # RAG 服务（检索 / 解析 / 入库，基于 RagFlow 改编）
@@ -199,6 +207,7 @@ moocow-agent/
 | 后端 | FastAPI · openai-agents · DeepSeek-V4-Pro / V3（SiliconFlow） |
 | RAG | Elasticsearch 8.11 · RRF 混合检索 · bge-reranker-v2-m3 · deepdoc（ONNX）· huqie 分词 |
 | 通信 | SSE 流式（4 类事件） · MCP（DashScope WebSearch / 百度地图） |
+| 可观测性 | Phoenix（自托管）· OpenInference · OpenTelemetry · OTLP |
 | 基础设施 | Docker Compose · PostgreSQL 15 · Redis 7 · JWT 认证 |
 
 ## 🔧 环境配置
@@ -226,7 +235,6 @@ cp backend/.env.example backend/.env      # 然后填入真实密钥
 <details>
 <summary><b>上传文档失败？</b></summary>
 
-- 首次解析大型 PDF 可能需要 1-2 分钟（超时已放宽至 120s）
 - 同名文件重复上传会被拒绝，请先删除旧文件
 - RAG 侧公共库上传仅限管理员（`rag-service/.env` 的 `ADMIN_USER_IDS`）
 </details>
@@ -243,15 +251,19 @@ cp backend/.env.example backend/.env      # 然后填入真实密钥
 需要在 `backend/.env` 填写真实的 `BAIDUMAP_AK`。
 </details>
 
+<details>
+<summary><b>Agent 观测数据在哪里看 / Phoenix 是空的？</b></summary>
+
+每次对话在 Phoenix（http://localhost:6006，项目 `moocow-agent`）产生一条 trace，可查看完整 Agent 调用链、token 消耗与耗时。trace 只在真实对话时产生（只浏览页面不会产生），且因批量上报有数秒延迟。Phoenix 不可用时追踪自动降级，不影响对话。
+</details>
+
 ## 📄 许可与致谢
 
 - 本项目后端与前端代码基于 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) 发布
-- `rag-service/` 目录部分代码基于 [RagFlow](https://github.com/infiniflow/ragflow)（Apache 2.0）改编，包括文档解析（deepdoc）、分词（huqie）、ES 混合检索等模块，特此致谢
-
 ---
 
 <div align="center">
 
-**MooCow-Agent** · 从售前咨询到售后救援，一个助手全程领航 🐮⚡
+**MooCow-Agent** · 从售前咨询到售后服务，一个助手全程领航 🐮⚡
 
 </div>

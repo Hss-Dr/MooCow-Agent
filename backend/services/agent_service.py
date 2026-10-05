@@ -1,7 +1,7 @@
 import re
 import json
 from collections.abc import AsyncGenerator
-from agents.run import Runner, RunConfig
+from agents.run import Runner
 from multi_agent.orchestrator_agent import orchestrator_agent, orchestrator_agent_fast
 from schemas.request import ChatMessageRequest
 from services.stream_response_service import process_stream_response
@@ -66,7 +66,6 @@ class MultiAgentService:
                     input=chat_history,  # 列表
                     context=run_context,
                     max_turns=5,  # COT(思考 行动 观察)--->迭代多少次（不是异常重试）
-                    run_config=RunConfig(tracing_disabled=True)
                 )
 
                 # 4. 处理Agent的事件流（事件流）

@@ -11,6 +11,11 @@ import os
 # 从环境变量读取数据库连接字符串
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# 显式指定 psycopg2 驱动：SQLAlchemy 2.1 起 postgresql:// 默认改用 psycopg(v3)，
+# 项目仅安装 psycopg2-binary，显式声明方言可兼容任意 SQLAlchemy 版本
+if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
+
 # 创建数据库引擎
 engine = create_engine(DATABASE_URL)
 

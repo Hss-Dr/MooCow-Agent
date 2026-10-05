@@ -14,7 +14,11 @@ mcp<2
 pystun3
 psycopg2-binary
 redis
-sqlalchemy>=2.0.0
+# 锁 <2.1：SQLAlchemy 2.1 起 postgresql:// 默认驱动从 psycopg2 切换为 psycopg(v3)，
+# 项目当前只装 psycopg2-binary，升级会报 No module named 'psycopg'。
+# 若要升 2.1+，需同步安装 psycopg 并验证连接池行为。
+sqlalchemy>=2.0.0,<2.1
 bcrypt>=4.0.0
 fastapi-jwt>=0.3.0
 python-jose[cryptography]>=3.3.0
+# 注：Phoenix 追踪依赖在 requirements-tracing.txt（独立安装层，见 Dockerfile）

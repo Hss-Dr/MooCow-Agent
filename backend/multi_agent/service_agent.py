@@ -1,6 +1,3 @@
-from agents import set_tracing_disabled
-
-set_tracing_disabled(True)
 from agents import Agent, ModelSettings
 from infrastructure.ai.openai_client import sub_model
 from infrastructure.tools.local.service_station import (

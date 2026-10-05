@@ -9,6 +9,7 @@ from api.chat_routes import router as chat_router
 from api.auth_routes import router as auth_router
 from infrastructure.logging.logger import logger
 from infrastructure.tools.mcp.mcp_manager import mcp_connect, mcp_cleanup
+from infrastructure.ai.tracing_setup import setup_phoenix_tracing, shutdown_phoenix_tracing
 
 
 @asynccontextmanager
@@ -27,6 +28,9 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"MCP连接建立失败: {str(e)}")
 
+    # 注册 Agent 追踪（Phoenix），失败不阻断启动
+    setup_phoenix_tracing()
+
     yield  # 应用运行期间（先别释放mcp链接 去处理请求...）
 
     # 应用关闭时执行
@@ -36,6 +40,9 @@ async def lifespan(app: FastAPI):
         logger.info("MCP连接清理完成")
     except Exception as e:
         logger.error(f"MCP连接清理失败: {str(e)}")
+
+    # 冲刷未上报的追踪数据
+    shutdown_phoenix_tracing()
 
 
 def create_fast_api() -> FastAPI:

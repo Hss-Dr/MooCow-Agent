@@ -4,7 +4,7 @@
 
 ### Full-Chain Intelligent Assistant for New Energy Vehicles · Multi-Agent + Skill Plugins + RAG
 
-**From pre-sales consultation to after-sales rescue — one assistant, all the way.**
+**From pre-sales consultation to after-sales service — one assistant, all the way.**
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -14,6 +14,7 @@
 [![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek_V4_Pro-4D6BFE)](https://www.deepseek.com/)
 [![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.11-FEC514?logo=elasticsearch&logoColor=black)](https://www.elastic.co/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![Phoenix](https://img.shields.io/badge/Phoenix-Agent_Tracing-EB4E3D)](https://phoenix.arize.com/)
 
 **English** · [简体中文](README.zh-CN.md)
 
@@ -55,7 +56,7 @@ cd moocow-agent
 The script automatically:
 
 1. Generates missing `.env` files from `.env.example` templates
-2. Builds and starts all Docker services (backend / RAG / ES / PG / Redis)
+2. Builds and starts all Docker services (backend / RAG / ES / PG / Redis / Phoenix)
 3. Installs frontend dependencies and starts the dev server in the background
 
 After startup:
@@ -65,6 +66,7 @@ After startup:
 | Frontend | http://localhost:5181 |
 | Backend API | http://localhost:8080/docs |
 | RAG Service | http://localhost:8001/docs |
+| Phoenix (Agent Tracing) | http://localhost:6006 |
 
 > ⚠️ **The only manual step**: edit `backend/.env` and fill in real model API keys. Services will start without them, but AI chat won't work.
 
@@ -106,7 +108,7 @@ Inspired by Claude Code's Skill design: the system prompt only routes scenarios,
 
 - **Dual-library retrieval**: company-shared (`company_kb`) + user personal library merged in one query
 - **Three-stage ranking**: ES RRF fusion (BM25 + KNN) → SiliconFlow `bge-reranker-v2-m3` semantic reranking → local hybrid-similarity fallback
-- **Document management**: upload → deepdoc parsing (ONNX models) → indexing, fully visualized
+- **Document management**: upload → parsing (ONNX models) → indexing, fully visualized
 - **Answer sourcing**: referenced documents appear below each answer — click to expand the exact retrieved snippet
 
 ### Immersive Chat Experience
@@ -115,6 +117,12 @@ Inspired by Claude Code's Skill design: the system prompt only routes scenarios,
 - Dark theme: DeepSeek-dark-inspired — pure black canvas, gray layering, a single brand blue
 - Thinking visualization: thinking-orbs dot-sphere animations (idle `solving` / streaming `working`), glowing input border
 - Day-grouped session list, stop generation, regenerate, one-click copy
+
+### Agent Observability (Phoenix)
+
+- **Every conversation = one trace**: orchestrator → routing tool → sub-agent → tool calls (RAG retrieval, web search, maps, skill loading) as a full span tree
+- **Per-span details**: model name, LLM token usage (in/out), latency, tool inputs and outputs
+- Self-hosted [Arize Phoenix](https://phoenix.arize.com/) at http://localhost:6006 — built on OpenInference / OpenTelemetry, so traces can be re-pointed to any OTLP-compatible backend later
 
 ## 🏗️ Architecture
 
@@ -133,15 +141,15 @@ Inspired by Claude Code's Skill design: the system prompt only routes scenarios,
 │  · Service Station Expert: Baidu Maps navigation            │
 │  · Skill Loader: sales · aftersales                         │
 │  · RAG Client · Web Search MCP (DashScope WebSearch)        │
-└─────────────┬───────────────────────────────┬───────────────┘
-              │                               │
-┌─────────────▼─────────────┐   ┌─────────────▼───────────────┐
-│  RAG Service               │   │  Infrastructure             │
-│  · Hybrid retrieval        │   │  · Elasticsearch 8.11       │
-│  · RRF coarse ranking      │   │  · PostgreSQL 15            │
-│  · Rerank semantic ranking │   │  · Redis 7                  │
-│  · deepdoc parsing         │   │                             │
-└───────────────────────────┘   └─────────────────────────────┘
+└─────────┬───────────────────────┬──────────────────────┬───────┘
+          │                       │                      │ OTLP
+┌─────────▼─────────┐   ┌─────────▼───────────┐   ┌──────▼──────────────────┐
+│  RAG Service       │   │  Infrastructure     │   │  Phoenix (Observability)│
+│  · Hybrid retrieval│   │  · Elasticsearch 8.11│  │  · Agent trace / span tree│
+│  · RRF coarse rank │   │  · PostgreSQL 15    │   │  · LLM token & latency   │
+│  · Rerank semantic │   │  · Redis 7          │   │  · Self-hosted, SQLite   │
+│  · deepdoc parsing │   │                     │   │    (OpenInference / OTel)│
+└───────────────────┘   └─────────────────────┘   └──────────────────────────┘
 ```
 
 ## 🧩 Skill Plugins
@@ -183,7 +191,7 @@ moocow-agent/
 │   ├── multi_agent/       # Orchestrator / Full-Chain / Service Station agents
 │   ├── prompts/           # System prompts
 │   ├── skills/            # ★ Skill plugins (sales / after-sales)
-│   ├── infrastructure/    # AI clients / Skill loader / local tools / MCP
+│   ├── infrastructure/    # AI clients / Skill loader / local tools / MCP / tracing (Phoenix)
 │   ├── api/               # Routes (auth / chat / session / repository)
 │   └── services/          # Business services (streaming / session)
 ├── rag-service/           # RAG service (retrieval / parsing / indexing, adapted from RagFlow)
@@ -199,6 +207,7 @@ moocow-agent/
 | Backend | FastAPI · openai-agents · DeepSeek-V4-Pro / V3 (SiliconFlow) |
 | RAG | Elasticsearch 8.11 · RRF hybrid retrieval · bge-reranker-v2-m3 · deepdoc (ONNX) · huqie tokenizer |
 | Communication | SSE streaming (4 event types) · MCP (DashScope WebSearch / Baidu Maps) |
+| Observability | Phoenix (self-hosted) · OpenInference · OpenTelemetry · OTLP |
 | Infrastructure | Docker Compose · PostgreSQL 15 · Redis 7 · JWT auth |
 
 ## 🔧 Configuration
@@ -226,7 +235,6 @@ Check that `SF_API_KEY` in `backend/.env` is replaced with a real key; inspect l
 <details>
 <summary><b>Document upload fails?</b></summary>
 
-- Parsing a large PDF for the first time may take 1–2 minutes (timeout relaxed to 120s)
 - Duplicate filenames are rejected — delete the old file first
 - Uploads to the shared library are admin-only (`ADMIN_USER_IDS` in `rag-service/.env`)
 </details>
@@ -243,15 +251,20 @@ Retrieval scope = company-shared library + the current user's personal library. 
 Fill in a real `BAIDUMAP_AK` in `backend/.env`.
 </details>
 
+<details>
+<summary><b>Where do I see agent traces / why is Phoenix empty?</b></summary>
+
+Every chat message produces one trace in Phoenix at http://localhost:6006 (project `moocow-agent`) — the full agent call chain with token usage and latency. Traces are only generated when an actual conversation happens (browsing pages alone produces nothing) and appear a few seconds later (batched export). If Phoenix is down, tracing degrades gracefully and chat keeps working.
+</details>
+
 ## 📄 License & Credits
 
 - Backend and frontend code are released under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-- Parts of `rag-service/` are adapted from [RagFlow](https://github.com/infiniflow/ragflow) (Apache 2.0), including document parsing (deepdoc), tokenization (huqie), and ES hybrid retrieval modules. Our sincere thanks to the RagFlow team.
 
 ---
 
 <div align="center">
 
-**MooCow-Agent** · From pre-sales consultation to after-sales rescue, one assistant all the way 🐮⚡
+**MooCow-Agent** · From pre-sales consultation to after-sales service, one assistant all the way 🐮⚡
 
 </div>

@@ -48,6 +48,12 @@ RUN pip install --no-cache-dir --timeout 100 -r requirements.txt || \
      pip config set global.index-url https://pypi.douban.com/simple && \
      pip install --no-cache-dir --timeout 100 -r requirements.txt)
 
+# Phoenix 追踪依赖（独立层：更新追踪包时复用缓存，不用重装全部依赖）
+COPY requirements-tracing.txt .
+RUN pip install --no-cache-dir --timeout 100 -r requirements-tracing.txt || \
+    (echo "追踪依赖安装失败，重试中..." && \
+     pip install --no-cache-dir --timeout 100 -r requirements-tracing.txt)
+
 # 复制应用代码
 COPY . .
 

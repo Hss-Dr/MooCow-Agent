@@ -29,6 +29,10 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
+
+      # Phoenix 可观测性（Agent 追踪导出地址，容器内通信）
+      - PHOENIX_OTLP_ENDPOINT=http://phoenix:6006/v1/traces
+      - PHOENIX_PROJECT_NAME=${PHOENIX_PROJECT_NAME:-moocow-agent}
     env_file:
       # JWT密钥等敏感配置来自 backend/.env（与RAG服务共享同一JWT_SECRET_KEY）
       # 注意：environment 中显式列出的变量优先于 env_file（如容器内的 DATABASE_URL）
@@ -170,12 +174,39 @@ services:
       timeout: 5s
       retries: 5
 
+  # ============================================
+  # Phoenix (Agent 追踪可观测平台)
+  # UI 与 OTLP HTTP 收集器同端口 6006；SQLite 数据持久化到 named volume
+  # ============================================
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: phoenix
+    ports:
+      - "6006:6006"
+    environment:
+      # SQLite 持久化目录（需 phoenix >= 4.0）
+      - PHOENIX_WORKING_DIR=/data
+    volumes:
+      - phoenix_data:/data
+    restart: unless-stopped
+    networks:
+      - gsk_network
+    healthcheck:
+      # 镜像内用 python urllib 探活（与 backend 保持同一模式）
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:6006/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 volumes:
   gsk_esdata01:
     driver: local
   pg_data:
     driver: local
   redis_data:
+    driver: local
+  phoenix_data:
     driver: local
 
 networks:

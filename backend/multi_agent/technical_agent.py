@@ -4,7 +4,7 @@ from infrastructure.tools.local.knowledge_base import query_rag_knowledge
 from infrastructure.tools.local.skill_tool import load_skill
 from infrastructure.tools.mcp.mcp_servers import search_mcp_client
 from agents import Agent, ModelSettings
-from agents import Runner, RunConfig
+from agents import Runner
 
 
 # 1. 定义全链路智能体（销售售前 + 售后技术 + 实时资讯）
@@ -35,7 +35,6 @@ async def run_single_test(case_name: str, input_text: str):
         result = Runner.run_streamed(
             technical_agent,
             input=input_text,
-            run_config=RunConfig(tracing_disabled=True),
         )
 
         async for event in result.stream_events():

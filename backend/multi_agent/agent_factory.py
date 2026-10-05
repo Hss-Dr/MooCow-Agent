@@ -1,5 +1,4 @@
 from agents import function_tool, Runner, RunContextWrapper
-from agents.run import RunConfig
 
 from multi_agent.technical_agent import technical_agent
 from multi_agent.service_agent import comprehensive_service_agent
@@ -86,7 +85,6 @@ async def consult_technical_expert(
             technical_agent,
             input=agent_input,
             context=tool_context.context,
-            run_config=RunConfig(tracing_disabled=True)
         )
 
         logger.info(f"[Route] 技术专家执行完成，返回长度: {len(result.final_output) if result.final_output else 0}")
@@ -118,7 +116,6 @@ async def query_service_station_and_navigate(
         result = await Runner.run(
             comprehensive_service_agent,
             input=query,
-            run_config=RunConfig(tracing_disabled=True)
         )
         return result.final_output
     except Exception as e:
